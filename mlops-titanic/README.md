@@ -1,4 +1,4 @@
-# 🚢 Titanic MLOps — Pipeline Completo de Produtização de Machine Learning
+# Titanic MLOps — Pipeline Completo de Produtização de Machine Learning
 
 Projeto end-to-end de **MLOps** que simula um fluxo real de produção de Machine
 Learning: ingestão de dados, EDA, treino de múltiplos modelos, seleção
@@ -11,7 +11,7 @@ prever se um passageiro sobreviveu (`Survived`: 0 ou 1).
 
 ---
 
-## 🗺️ Visão geral da arquitetura
+## Visão geral da arquitetura
 
 ```
 ┌─────────────┐     ┌──────────────┐     ┌───────────────┐     ┌──────────────┐
@@ -28,7 +28,7 @@ prever se um passageiro sobreviveu (`Survived`: 0 ou 1).
                      └──────────────┘                          └──────────────┘
 ```
 
-## 📁 Estrutura do projeto
+## Estrutura do projeto
 
 ```
 mlops-titanic/
@@ -68,7 +68,7 @@ mlops-titanic/
 
 ---
 
-## 🚀 Como executar
+## Como executar
 
 ### 1. Instalação
 
@@ -185,7 +185,7 @@ Streamlit) para a API passar a servir a nova versão sem reiniciar o processo.
 
 ---
 
-## 🐳 Deploy com Docker
+## Deploy com Docker
 
 ```bash
 docker compose up --build
@@ -217,7 +217,7 @@ linha de código precisa mudar.
 
 ---
 
-## 🧪 Testes automatizados
+## Testes automatizados
 
 ```bash
 pytest tests/ -v
@@ -227,32 +227,7 @@ lógica de seleção/desempate, lógica de promoção e os endpoints da API.
 
 ---
 
-## 🔄 CI/CD (GitHub Actions)
-
-`.github/workflows/mlops_pipeline.yml` define 3 jobs:
-1. **test** — roda a suíte pytest a cada push/PR
-2. **retrain** — executa o pipeline completo e publica o modelo como artefato
-   do workflow (simula retraining automatizado via CI)
-3. **build-and-push** — builda a imagem Docker da API (push para um registry
-   é opcional, requer configurar secrets)
-
-Pode ser disparado manualmente (`workflow_dispatch`) para simular a chegada
-de "novos dados em produção".
-
----
-
-## 📦 Publicando o projeto
-
-### GitHub
-```bash
-git init
-git add .
-git commit -m "feat: pipeline completo de MLOps - Titanic"
-git branch -M main
-git remote add origin <url-do-seu-repositorio>
-git push -u origin main
-```
-
+## CI/CD (GitHub Actions)
 ### Deploy da API (opções gratuitas/simples)
 - **Render** / **Railway**: conectam direto no repositório GitHub e detectam
   o `Dockerfile` automaticamente. Configure a porta `8000` e pronto.
@@ -264,7 +239,7 @@ git push -u origin main
 
 ---
 
-## 🧠 Decisões de design (e por quê)
+## Decisões de design (e por quê)
 
 - **Pipeline do sklearn** (pré-processamento + modelo no mesmo objeto): evita
   inconsistência entre o que foi usado no treino e o que é usado na inferência
