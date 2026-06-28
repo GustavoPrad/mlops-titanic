@@ -1,0 +1,39 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+
+# Ambientes virtuais
+venv/
+.venv/
+env/
+
+# Dados gerados pelo pipeline (mantemos apenas o raw original versionado)
+data/processed/*.csv
+data/incoming/*.csv
+data/incoming/_processed/
+
+# Modelos e artefatos gerados (versão final é commitada conscientemente
+# via `make pipeline`, mas o registry/champion local não deve poluir PRs)
+models/*.pkl
+!models/champion_model.pkl
+
+# Relatórios de EDA gerados automaticamente
+reports/figures/*.png
+
+# Logs
+*.log
+
+# Streamlit
+.streamlit/
+
+# IDE / OS
+.vscode/
+.idea/
+.DS_Store
+
+# Docker
+.dockerignore

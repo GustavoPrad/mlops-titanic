@@ -1,0 +1,40 @@
+# =========================================================
+# docker-compose.yml
+# Orquestra os dois serviços do projeto:
+#   - api: serviço de inferência (FastAPI)
+#   - app: interface de consumo (Streamlit)
+#
+# Uso:
+#   docker compose up --build
+#   API:  http://localhost:8000/docs
+#   App:  http://localhost:8501
+# =========================================================
+version: "3.9"
+
+services:
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: titanic-mlops-api
+    ports:
+      - "8000:8000"
+    volumes:
+      # permite que o pipeline rodado fora do container atualize o modelo
+      # e a API sirva a versão mais recente após /model/reload
+      - ./models:/app/models
+      - ./data:/app/data
+    restart: unless-stopped
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile.app
+    container_name: titanic-mlops-app
+    ports:
+      - "8501:8501"
+    environment:
+      - API_URL=http://api:8000
+    depends_on:
+      - api
+    restart: unless-stopped

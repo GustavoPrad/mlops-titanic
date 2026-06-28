@@ -1,0 +1,62 @@
+# =========================================================
+# config.yaml — Parâmetros centrais do pipeline de MLOps
+# Alterar este arquivo muda o comportamento do pipeline
+# sem precisar tocar em código.
+# =========================================================
+
+data:
+  raw_path: "data/raw/titanic.csv"
+  processed_path: "data/processed/titanic_clean.csv"
+  target_column: "Survived"
+  test_size: 0.2
+  random_state: 42
+  # colunas que serão descartadas antes do treino
+  drop_columns: ["PassengerId", "Name", "Ticket", "Cabin"]
+
+features:
+  numeric: ["Age", "SibSp", "Parch", "Fare", "FamilySize"]
+  categorical: ["Pclass", "Sex", "Embarked"]
+
+models:
+  # cada modelo treinado no pipeline + seus hiperparâmetros
+  logistic_regression:
+    enabled: true
+    params:
+      max_iter: 1000
+      C: 1.0
+      random_state: 42
+
+  random_forest:
+    enabled: true
+    params:
+      n_estimators: 200
+      max_depth: 8
+      random_state: 42
+
+  xgboost:
+    enabled: true
+    params:
+      n_estimators: 200
+      max_depth: 4
+      learning_rate: 0.1
+      random_state: 42
+      eval_metric: "logloss"
+
+evaluation:
+  # métrica principal usada para escolher o melhor modelo
+  primary_metric: "f1_score"
+  # métrica de desempate em caso de empate na métrica principal
+  tiebreaker_metric: "roc_auc"
+  # diferença mínima para considerar um modelo novo "melhor"
+  # (evita troca de modelo por ruído estatístico)
+  improvement_threshold: 0.0
+
+persistence:
+  models_dir: "models"
+  champion_model_path: "models/champion_model.pkl"
+  champion_metadata_path: "models/champion_metadata.json"
+  registry_path: "models/model_registry.json"
+
+api:
+  host: "0.0.0.0"
+  port: 8000

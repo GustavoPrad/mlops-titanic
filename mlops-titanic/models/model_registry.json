@@ -1,0 +1,15 @@
+[
+  {
+    "version": 1,
+    "model_name": "random_forest",
+    "metrics": {
+      "accuracy": 0.8115183246073299,
+      "f1_score": 0.7428571428571429,
+      "roc_auc": 0.8309728349198979,
+      "precision": 0.7761194029850746,
+      "recall": 0.7123287671232876
+    },
+    "trained_at": "2026-06-28T15:15:44.410957+00:00",
+    "promoted": true
+  }
+]

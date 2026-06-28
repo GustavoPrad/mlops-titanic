@@ -1,0 +1,100 @@
+# =========================================================
+# .github/workflows/mlops_pipeline.yml
+# CI/CD do projeto de MLOps.
+#
+# Jobs:
+#  1. test            -> roda os testes automatizados (pytest)
+#  2. retrain          -> executa o pipeline completo de treino/seleção/
+#                         persistência sempre que código ou dados mudarem
+#  3. build-and-push   -> builda a imagem Docker da API (opcional, requer
+#                         secrets de um registry configurados)
+#
+# Triggers:
+#  - push na branch main
+#  - pull_request
+#  - manualmente (workflow_dispatch) -> simula "novos dados disponíveis"
+# =========================================================
+name: MLOps Pipeline
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Configurar Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: "pip"
+
+      - name: Instalar dependências
+        run: pip install -r requirements.txt
+
+      - name: Rodar testes automatizados
+        run: pytest tests/ -v
+
+  retrain:
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Configurar Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: "pip"
+
+      - name: Instalar dependências
+        run: pip install -r requirements.txt
+
+      - name: Executar pipeline de MLOps (treino + seleção + persistência)
+        run: python -m src.pipeline
+
+      - name: Publicar artefatos do modelo campeão
+        uses: actions/upload-artifact@v4
+        with:
+          name: champion-model
+          path: |
+            models/champion_model.pkl
+            models/champion_metadata.json
+            models/model_registry.json
+
+      - name: Commitar modelo atualizado (versionamento do artefato)
+        run: |
+          git config user.name "mlops-bot"
+          git config user.email "mlops-bot@users.noreply.github.com"
+          git add models/champion_metadata.json models/model_registry.json
+          git diff --staged --quiet || git commit -m "ci: atualiza modelo campeão [skip ci]"
+          git push || echo "Nada para enviar (sem permissão de push ou sem mudanças)"
+        continue-on-error: true
+
+  build-and-push:
+    needs: retrain
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build da imagem Docker da API
+        run: docker build -t titanic-mlops-api:latest -f Dockerfile .
+
+      # Para publicar em um registry (Docker Hub, GHCR, etc), adicione:
+      # - name: Login no registry
+      #   uses: docker/login-action@v3
+      #   with:
+      #     registry: ghcr.io
+      #     username: ${{ github.actor }}
+      #     password: ${{ secrets.GITHUB_TOKEN }}
+      # - name: Push da imagem
+      #   run: |
+      #     docker tag titanic-mlops-api:latest ghcr.io/${{ github.repository }}:latest
+      #     docker push ghcr.io/${{ github.repository }}:latest
